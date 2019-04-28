@@ -9,47 +9,54 @@ Status: Experimental
 
 * `Routes`: Create HTTP GET, POST, PUT, PATCH, DELETE routes. Check **Handler Signature** for more informations.
 
-	routes := rest.NewRoutes().
-				GET(PATH, getHandler).
-				POST(PATH, postHandler)
-
+```
+routes := rest.NewRoutes().
+			GET(PATH, getHandler).
+			POST(PATH, postHandler)
+```
 
 * `Filters`: Create Pre and Post-filters, executed before and after your handler. Your filters must return `true` if everything is OK, or `false` for stopping the treatment.
 
-	filters := rest.NewFilters().
-		AddPreFilter(func(response http.ResponseWriter, request *http.Request) bool {
-			fmt.Println("Filter 1")
-			return true
-		}).
-		AddPostFilter(func(response http.ResponseWriter, request *http.Request) bool {
-			fmt.Println("Filter 2")
-			return true
-		})
+```
+filters := rest.NewFilters().
+	AddPreFilter(func(response http.ResponseWriter, request *http.Request) bool {
+		fmt.Println("Filter 1")
+		return true
+	}).
+	AddPostFilter(func(response http.ResponseWriter, request *http.Request) bool {
+		fmt.Println("Filter 2")
+		return true
+	})
+```
 
 
 * `Dispatcher`: Initialized with your routes and filters, it implements Golang's `ServeHTTP()` function.
 
-	dispatcher := rest.NewDispatcher(routes, filters)
+```
+dispatcher := rest.NewDispatcher(routes, filters)
 
-	const PORT = ":8080"
+const PORT = ":8080"
 
-	s := &http.Server{
-		Addr:           PORT,
-		Handler:        dispatcher,
-		ReadTimeout:    10 * time.Second,
-		WriteTimeout:   10 * time.Second,
-		MaxHeaderBytes: 1 << 20,
-	}
+s := &http.Server{
+	Addr:           PORT,
+	Handler:        dispatcher,
+	ReadTimeout:    10 * time.Second,
+	WriteTimeout:   10 * time.Second,
+	MaxHeaderBytes: 1 << 20,
+}
+```
 
 
 
 ## Handler Signature
 
-	// If you don't handle a HTTP Request
-	func(http *rest.Http) rest.HttpResponse
+```
+// If you don't handle a HTTP Request
+func(http *rest.Http) rest.HttpResponse
 
-	// If you handle a HTTP Request
-	func(http *rest.Http, requestBody *YourType) rest.HttpResponse
+// If you handle a HTTP Request
+func(http *rest.Http, requestBody *YourType) rest.HttpResponse
+```
 
 The `rest.Http` structure contains the following fields:
 * `Response`: Golang's `http.ResponseWriter` type
@@ -87,56 +94,58 @@ The `rest.Http` structure contains the following fields:
 
 ## Example of use (Golang 1)
 
-	package main
+```
+package main
 
-	import (
-		"../rest"
-		"net/http"
-		"time"
-		"fmt"
-	)
+import (
+	"github.com/eau-de-la-seine/golang-rest"
+	"net/http"
+	"time"
+	"fmt"
+)
 
-	// Lower case fields are not visible by Golang reflection
-	type DemoBody struct {
-		A int `json:"a"`
-		B string `json:"b"`
+// Lower case fields are not visible by Golang reflection
+type DemoBody struct {
+	A int `json:"a"`
+	B string `json:"b"`
+}
+
+func main() {
+	getHandler := func(http *rest.Http) rest.HttpResponse {
+		return rest.TextResponse(200, `{ "text": "Lambda hello" }`)
 	}
 
-	func main() {
-		getHandler := func(http *rest.Http) rest.HttpResponse {
-			return rest.TextResponse(200, `{ "text": "Lambda hello" }`)
-		}
-
-		postHandler := func(http *rest.Http, body *DemoBody) rest.HttpResponse {
-			return rest.JsonResponse(200, &DemoBody{A: body.A, B: body.B})
-		}
-
-		const PATH = "/path/path"
-
-		routes := rest.NewRoutes().
-			GET(PATH, getHandler).
-			POST(PATH, postHandler)
-
-		filters := rest.NewFilters().
-			AddPreFilter(func(response http.ResponseWriter, request *http.Request) bool {
-				fmt.Println("Filter 1")
-				return true
-			}).
-			AddPostFilter(func(response http.ResponseWriter, request *http.Request) bool {
-				fmt.Println("Filter 2")
-				return true
-			})
-
-		dispatcher := rest.NewDispatcher(routes, filters)
-
-		const PORT = ":8080"
-
-		s := &http.Server{
-			Addr:           PORT,
-			Handler:        dispatcher,
-			ReadTimeout:    10 * time.Second,
-			WriteTimeout:   10 * time.Second,
-			MaxHeaderBytes: 1 << 20,
-		}
-		fmt.Println(s.ListenAndServe())
+	postHandler := func(http *rest.Http, body *DemoBody) rest.HttpResponse {
+		return rest.JsonResponse(200, &DemoBody{A: body.A, B: body.B})
 	}
+
+	const PATH = "/path/path"
+
+	routes := rest.NewRoutes().
+		GET(PATH, getHandler).
+		POST(PATH, postHandler)
+
+	filters := rest.NewFilters().
+		AddPreFilter(func(response http.ResponseWriter, request *http.Request) bool {
+			fmt.Println("Filter 1")
+			return true
+		}).
+		AddPostFilter(func(response http.ResponseWriter, request *http.Request) bool {
+			fmt.Println("Filter 2")
+			return true
+		})
+
+	dispatcher := rest.NewDispatcher(routes, filters)
+
+	const PORT = ":8080"
+
+	s := &http.Server{
+		Addr:           PORT,
+		Handler:        dispatcher,
+		ReadTimeout:    10 * time.Second,
+		WriteTimeout:   10 * time.Second,
+		MaxHeaderBytes: 1 << 20,
+	}
+	fmt.Println(s.ListenAndServe())
+}
+```
