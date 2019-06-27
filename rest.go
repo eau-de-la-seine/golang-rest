@@ -504,18 +504,22 @@ func NewDispatcher(routes Routes, filters *Filters) *Dispatcher {
 		panic("[NewDispatcher] routes must not be `nil`")
 	}
 
-	obj := new(Dispatcher)
-	obj.routes = routes
+	dispatcher := new(Dispatcher)
+	dispatcher.routes = routes
+
+	if filters == nil {
+		return dispatcher
+	}
 
 	if len(filters.filters["pre"]) > 0 {
-		obj.preFilters = filters.filters["pre"]
+		dispatcher.preFilters = filters.filters["pre"]
 	}
 
 	if len(filters.filters["post"]) > 0 {
-		obj.postFilters = filters.filters["post"]
+		dispatcher.postFilters = filters.filters["post"]
 	}
 
-	return obj
+	return dispatcher
 }
 
 func (dispatcher *Dispatcher) getHandler(httpMethod string, calledPath string) (CustomHandler, error) {
