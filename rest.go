@@ -542,7 +542,7 @@ func (dispatcher *Dispatcher) getHandler(httpMethod string, calledPath string) (
 		}
 	}
 
-	// TODO: return a 404 not found handler, otherwise a 200 response will be returned by default
+	// Error = 404 not found, otherwise a 200 response will be returned by default
 	return nil, errors.New(fmt.Sprintf("[Dispatcher#getHandler] Route does NOT exists => Method: '%s' | Path: '%s'", httpMethod, calledPath))
 }
 
@@ -562,6 +562,7 @@ func (dispatcher *Dispatcher) ServeHTTP(response http.ResponseWriter, request *h
 	if err != nil {
 		// Printing debug
 		log.Debug(err.Error())
+		response.WriteHeader(404)
 		return
 	}
 

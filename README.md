@@ -4,8 +4,6 @@ A simple REST framework for creating server-side web application with Golang 1
 
 Status: Experimental
 
-TODO: return 404 if route not found
-
 
 ## Types
 
