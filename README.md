@@ -72,8 +72,8 @@ The `rest.Http` structure contains the following fields:
 
 ### Returning JSON or XML response
 
-* `JsonResponse(statusCode int, responseBody interface{})`
-* `XmlResponse(statusCode int, responseBody interface{})`
+* `JsonResponse(statusCode int, responseBody interface{}, customHeaders map[string]string)`
+* `XmlResponse(statusCode int, responseBody interface{}, customHeaders map[string]string)`
 
 
 ### Returning JSON or XML formatted error reponse
@@ -89,7 +89,7 @@ The `rest.Http` structure contains the following fields:
 
 ### Other cases
 
-* `TextResponse(statusCode int, responseBody string)`
+* `TextResponse(statusCode int, responseBody string, customHeaders map[string]string)`
 * `NoContentResponse()`
 
 

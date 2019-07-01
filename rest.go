@@ -28,6 +28,7 @@ type HttpResponse interface {
 
 // HTTP RESPONSE (JSON/XML)
 type ResponseWriter struct {
+	customHeaders map[string]string
 	contentType string
 	statusCode int
 	responseBody interface{}
@@ -37,6 +38,10 @@ type ResponseWriter struct {
 func (r *ResponseWriter) write(response http.ResponseWriter) {
 	response.WriteHeader(r.statusCode)
 	response.Header().Set("Content-Type", r.contentType)
+
+	for key, value := range r.customHeaders {
+		response.Header().Set(key, value)
+	}
 
 	if marshallizedResponse, marshalErr := r.marshal(r.responseBody); marshalErr == nil {
 		// Write HTTP response
@@ -81,6 +86,7 @@ func (r *NoContentResponseWriter) write(response http.ResponseWriter) {
 // HTTP RESPONSE (TEXT)
 
 type TextResponseWriter struct {
+	customHeaders map[string]string
 	statusCode int
 	responseBody string
 }
@@ -88,21 +94,28 @@ type TextResponseWriter struct {
 func (r *TextResponseWriter) write(response http.ResponseWriter) {
 	response.WriteHeader(r.statusCode)
 	response.Header().Set("Content-Type", "text/plain")
+
+	for key, value := range r.customHeaders {
+		response.Header().Set(key, value)
+	}
+
 	fmt.Fprintf(response, r.responseBody)
 }
 
 // IMPLEMENTATIONS
 
-func JsonResponse(statusCode int, responseBody interface{}) HttpResponse {
+func JsonResponse(statusCode int, responseBody interface{}, customHeaders map[string]string) HttpResponse {
 	return &ResponseWriter{
+		customHeaders: customHeaders,
 		contentType: "application/json",
 		statusCode: statusCode,
 		responseBody: responseBody,
 		marshal: json.Marshal}
 }
 
-func XmlResponse(statusCode int, responseBody interface{}) HttpResponse {
+func XmlResponse(statusCode int, responseBody interface{}, customHeaders map[string]string) HttpResponse {
 	return &ResponseWriter{
+		customHeaders: customHeaders,
 		contentType: "application/xml",
 		statusCode: statusCode,
 		responseBody: responseBody,
