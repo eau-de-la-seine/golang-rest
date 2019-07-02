@@ -36,12 +36,13 @@ type ResponseWriter struct {
 }
 
 func (r *ResponseWriter) write(response http.ResponseWriter) {
-	response.WriteHeader(r.statusCode)
 	response.Header().Set("Content-Type", r.contentType)
 
 	for key, value := range r.customHeaders {
 		response.Header().Set(key, value)
 	}
+
+	response.WriteHeader(r.statusCode)
 
 	if marshallizedResponse, marshalErr := r.marshal(r.responseBody); marshalErr == nil {
 		// Write HTTP response
@@ -68,9 +69,9 @@ func (r *FileResponseWriter) write(response http.ResponseWriter) {
 	}
 
 	response.Header().Set("Content-Disposition", r.contentDisposition)
+	response.Header().Set("Content-Type", r.contentType)
 
 	response.WriteHeader(r.statusCode)
-	response.Header().Set("Content-Type", r.contentType)
 
 	if _, copyErr := io.Copy(response, r.file); copyErr != nil {
 		log.Debug("[FileResponseWriter#write] Copy => %s", copyErr.Error())
@@ -94,12 +95,13 @@ type TextResponseWriter struct {
 }
 
 func (r *TextResponseWriter) write(response http.ResponseWriter) {
-	response.WriteHeader(r.statusCode)
 	response.Header().Set("Content-Type", "text/plain")
 
 	for key, value := range r.customHeaders {
 		response.Header().Set(key, value)
 	}
+
+	response.WriteHeader(r.statusCode)
 
 	if _, err := response.Write([]byte(r.responseBody)); err != nil {
 		log.Debug("[TextResponseWriter#write] response.Write => %s", err.Error())
