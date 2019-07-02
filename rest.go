@@ -45,7 +45,9 @@ func (r *ResponseWriter) write(response http.ResponseWriter) {
 
 	if marshallizedResponse, marshalErr := r.marshal(r.responseBody); marshalErr == nil {
 		// Write HTTP response
-		fmt.Fprintf(response, string(marshallizedResponse))
+		if _, err := response.Write(marshallizedResponse); err != nil {
+			log.Debug("[ResponseWriter#write] response.Write => %s", err.Error())
+		}
 	} else {
 		log.Debug("[ResponseWriter#write] marshal => %s", marshalErr.Error())
 	}
@@ -99,7 +101,9 @@ func (r *TextResponseWriter) write(response http.ResponseWriter) {
 		response.Header().Set(key, value)
 	}
 
-	fmt.Fprintf(response, r.responseBody)
+	if _, err := response.Write([]byte(r.responseBody)); err != nil {
+		log.Debug("[TextResponseWriter#write] response.Write => %s", err.Error())
+	}
 }
 
 // IMPLEMENTATIONS
