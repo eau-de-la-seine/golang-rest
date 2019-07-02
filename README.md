@@ -51,10 +51,10 @@ s := &http.Server{
 ## Handler Signature
 
 ```
-// If you don't handle a HTTP Request
+// If you don't handle a HTTP Request Body
 func(http *rest.Http) rest.HttpResponse
 
-// If you handle a HTTP Request
+// If you handle a HTTP Request Body
 func(http *rest.Http, requestBody *YourType) rest.HttpResponse
 ```
 
@@ -112,11 +112,11 @@ type DemoBody struct {
 
 func main() {
 	getHandler := func(http *rest.Http) rest.HttpResponse {
-		return rest.TextResponse(200, `{ "text": "Lambda hello" }`)
+		return rest.TextResponse(200, `{ "text": "Lambda hello" }`, nil)
 	}
 
 	postHandler := func(http *rest.Http, body *DemoBody) rest.HttpResponse {
-		return rest.JsonResponse(200, &DemoBody{A: body.A, B: body.B})
+		return rest.JsonResponse(200, &DemoBody{A: body.A, B: body.B}, nil)
 	}
 
 	const PATH = "/path/path"
