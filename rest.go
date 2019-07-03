@@ -568,7 +568,7 @@ func (dispatcher *Dispatcher) ServeHTTP(response http.ResponseWriter, request *h
 	if err != nil {
 		// Printing debug
 		log.Debug(err.Error())
-		response.WriteHeader(404)
+		response.WriteHeader(http.StatusNotFound)
 		return
 	}
 
