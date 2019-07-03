@@ -28,19 +28,16 @@ type HttpResponse interface {
 
 // HTTP RESPONSE (JSON/XML)
 type ResponseWriter struct {
-	customHeaders map[string]string
 	contentType string
 	statusCode int
 	responseBody interface{}
+
+	// Note: Cannot use json.NewEncoder / xml.NewEncoder signature because Golang does not support covariance
 	marshal func(interface{}) ([]byte, error)
 }
 
 func (r *ResponseWriter) write(response http.ResponseWriter) {
 	response.Header().Set("Content-Type", r.contentType)
-
-	for key, value := range r.customHeaders {
-		response.Header().Set(key, value)
-	}
 
 	response.WriteHeader(r.statusCode)
 
@@ -89,17 +86,12 @@ func (r *NoContentResponseWriter) write(response http.ResponseWriter) {
 // HTTP RESPONSE (TEXT)
 
 type TextResponseWriter struct {
-	customHeaders map[string]string
 	statusCode int
 	responseBody string
 }
 
 func (r *TextResponseWriter) write(response http.ResponseWriter) {
 	response.Header().Set("Content-Type", "text/plain")
-
-	for key, value := range r.customHeaders {
-		response.Header().Set(key, value)
-	}
 
 	response.WriteHeader(r.statusCode)
 
@@ -110,18 +102,16 @@ func (r *TextResponseWriter) write(response http.ResponseWriter) {
 
 // IMPLEMENTATIONS
 
-func JsonResponse(statusCode int, responseBody interface{}, customHeaders map[string]string) HttpResponse {
+func JsonResponse(statusCode int, responseBody interface{}) HttpResponse {
 	return &ResponseWriter{
-		customHeaders: customHeaders,
 		contentType: "application/json",
 		statusCode: statusCode,
 		responseBody: responseBody,
 		marshal: json.Marshal}
 }
 
-func XmlResponse(statusCode int, responseBody interface{}, customHeaders map[string]string) HttpResponse {
+func XmlResponse(statusCode int, responseBody interface{}) HttpResponse {
 	return &ResponseWriter{
-		customHeaders: customHeaders,
 		contentType: "application/xml",
 		statusCode: statusCode,
 		responseBody: responseBody,

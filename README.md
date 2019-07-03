@@ -70,8 +70,8 @@ The `rest.Http` structure contains the following fields:
 
 ### Returning JSON or XML response
 
-* `JsonResponse(statusCode int, responseBody interface{}, customHeaders map[string]string)`
-* `XmlResponse(statusCode int, responseBody interface{}, customHeaders map[string]string)`
+* `JsonResponse(statusCode int, responseBody interface{})`
+* `XmlResponse(statusCode int, responseBody interface{})`
 
 
 ### Returning JSON or XML formatted error reponse
@@ -87,7 +87,7 @@ The `rest.Http` structure contains the following fields:
 
 ### Other cases
 
-* `TextResponse(statusCode int, responseBody string, customHeaders map[string]string)`
+* `TextResponse(statusCode int, responseBody string)`
 * `NoContentResponse()`
 
 
@@ -112,11 +112,11 @@ type DemoBody struct {
 
 func main() {
 	getHandler := func(http *rest.Http) rest.HttpResponse {
-		return rest.TextResponse(200, `{ "text": "Lambda hello" }`, nil)
+		return rest.TextResponse(200, `{ "text": "Lambda hello" }`)
 	}
 
 	postHandler := func(http *rest.Http, body *DemoBody) rest.HttpResponse {
-		return rest.JsonResponse(200, &DemoBody{A: body.A, B: body.B}, nil)
+		return rest.JsonResponse(200, &DemoBody{A: body.A, B: body.B})
 	}
 
 	const PATH = "/path/path"
